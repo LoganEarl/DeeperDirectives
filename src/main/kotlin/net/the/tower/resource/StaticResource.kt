@@ -1,4 +1,4 @@
-package net.the.tower
+package net.the.tower.resource
 
 import io.quarkus.runtime.StartupEvent
 import io.vertx.ext.web.Router

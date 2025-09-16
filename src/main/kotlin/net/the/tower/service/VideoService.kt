@@ -1,4 +1,4 @@
-package net.the.tower
+package net.the.tower.service
 
 import io.quarkus.runtime.StartupEvent
 import io.smallrye.mutiny.Multi
@@ -6,9 +6,11 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import jakarta.inject.Inject
+import org.bytedeco.javacv.Java2DFrameConverter
 import org.bytedeco.javacv.OpenCVFrameGrabber
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
+import java.time.Duration
 import java.util.concurrent.ScheduledExecutorService
 import java.util.function.Supplier
 import javax.imageio.ImageIO
@@ -23,7 +25,7 @@ class VideoService @Inject constructor(
     }
 
     private val grabber = OpenCVFrameGrabber(0)
-    val converter = org.bytedeco.javacv.Java2DFrameConverter()
+    val converter = Java2DFrameConverter()
     private var hotFrameStream: Multi<ByteArray>? = null
 
 
@@ -33,7 +35,7 @@ class VideoService @Inject constructor(
         hotFrameStream = Multi.createBy().repeating().uni(Supplier {
             Uni.createFrom().item { takeSingleFrame() }
         })
-            .withDelay(java.time.Duration.ofMillis(5))
+            .withDelay(Duration.ofMillis(5))
             .indefinitely()
             .toHotStream()
             .onCancellation().invoke { grabber.stop() }
